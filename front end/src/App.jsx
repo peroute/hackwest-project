@@ -1,24 +1,31 @@
-import React from 'react';
-import ChatScreen from './pages/ChatScreen';
-import styles from './App.module.css';
+import { useState } from 'react'
+import Login from '/Users/aminagahramanova/Desktop/hackwest-project/front end/src/components/Login.jsx'
+import ChatPage from './pages/ChatPage'
+import '/Users/aminagahramanova/Desktop/hackwest-project/front end/src/styles/Login.css'
 
-const Logo = () => (
-  <div className={styles.logo} aria-label="Texas Tech University Logo" />
-);
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
 
-const App = () => (
-  <div className={styles.appContainer}>
-    <header className={styles.header}>
-      <Logo />
-      <h1 className={styles.title}>Texas Tech University AI Chat</h1>
-    </header>
-    <main className={styles.main}>
-      <ChatScreen />
-    </main>
-    <footer className={styles.footer}>
-      &copy; {new Date().getFullYear()} Texas Tech University. All rights reserved.
-    </footer>
-  </div>
-);
+  const handleLogin = (username) => {
+    setCurrentUser(username)
+    setIsLoggedIn(true)
+  }
 
-export default App;
+  const handleLogout = () => {
+    setCurrentUser(null)
+    setIsLoggedIn(false)
+  }
+
+  return (
+    <div className="App">
+      {isLoggedIn ? (
+        <ChatPage />
+      ) : (
+        <Login onLogin={handleLogin} />
+      )}
+    </div>
+  )
+}
+
+export default App
