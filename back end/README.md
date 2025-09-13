@@ -1,407 +1,253 @@
-# University Resources API - PostgreSQL + MongoDB Atlas
+# Texas Tech University AI Assistant
 
-A powerful FastAPI application with **PostgreSQL + MongoDB Atlas** for large-scale resource management and AI-powered semantic search using Google Gemini 2.5 Pro.
+A FastAPI-based AI assistant that provides educational support and campus resource information for Texas Tech University students.
 
-## 🏗️ **Hybrid Architecture Overview**
+## Features
 
-This system combines the best of both worlds:
+- **Intelligent AI Responses**: Automatically detects question types and provides appropriate responses
+- **Educational Support**: Study strategies, time management, exam preparation, and academic advice
+- **Campus Resources**: Search and find fitness programs, mental health services, library resources, and tutoring
+- **MongoDB Integration**: Stores and searches university resources
+- **SQLite Database**: Tracks user questions and search history
+- **No Authentication Required**: Simple API that accepts just the question
 
-- **🗄️ PostgreSQL**: Reliable relational database for user data, metadata, and analytics
-- **☁️ MongoDB Atlas**: Cloud-based vector database for large-scale semantic search
-- **🤖 Gemini AI**: Google's advanced AI for intelligent responses
-- **📊 Analytics**: Comprehensive search logging and user behavior tracking
+## Quick Start
 
-## ✨ **Key Features**
+### Prerequisites
 
-- **Large-Scale Data**: Handles millions of resources with vector embeddings
-- **AI-Powered Search**: Semantic understanding with Gemini 2.5 Pro
-- **User Management**: Complete user authentication and profile system
-- **Advanced Analytics**: Search patterns, user behavior, and performance metrics
-- **Batch Processing**: Efficient bulk operations for big data
-- **Real-Time Search**: Sub-second response times with vector similarity
-- **Scalable Architecture**: Designed for production workloads
-- **Cloud-Native**: MongoDB Atlas provides global scalability
+- Python 3.8 or higher
+- pip (Python package installer)
 
-## 🚀 **Quick Start**
+### Installation
 
-### **1. Prerequisites**
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd "back end"
+   ```
 
-- **PostgreSQL 12+** (for user data)
-- **MongoDB Atlas Account** (for vector search)
-- **Python 3.8+** (for the application)
+2. **Create a virtual environment**
+   ```bash
+   python -m venv venv
+   ```
 
-### **2. Setup**
+3. **Activate the virtual environment**
+   
+   **Windows:**
+   ```bash
+   venv\Scripts\activate
+   ```
+   
+   **macOS/Linux:**
+   ```bash
+   source venv/bin/activate
+   ```
 
-```bash
-# Clone and navigate to the project
-cd "back end"
+4. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# Run the hybrid setup script
-python setup_hybrid.py
-```
+5. **Set up environment variables**
+   
+   Create a `.env` file in the project root:
+   ```env
+   MONGODB_URL=your_mongodb_atlas_connection_string
+   GEMINI_API_KEY=your_gemini_api_key_optional
+   ```
 
-### **3. Start the Application**
+6. **Run the application**
+   ```bash
+   python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
 
-```bash
-# Start the FastAPI server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+7. **Access the API**
+   - API Documentation: http://localhost:8000/docs
+   - API Base URL: http://localhost:8000
 
-### **4. Access the API**
+## API Usage
 
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
+### Ask a Question
 
-## 📊 **Database Architecture**
+**Endpoint:** `POST /api/v1/ask/`
 
-### **PostgreSQL (User Data & Metadata)**
-```sql
--- Users table
-users (id, username, email, hashed_password, is_active, is_admin, created_at, updated_at)
-
--- Resources table (metadata only)
-resources (
-    id, title, description, url, category, tags, is_public, owner_id, 
-    mongodb_id, created_at, updated_at
-)
-
--- Questions table
-questions (id, question_text, answer_text, user_id, resource_id, similarity_score, created_at)
-
--- Search logs table
-search_logs (id, query, results_count, user_id, search_type, response_time_ms, created_at)
-```
-
-### **MongoDB Atlas (Vector Search)**
+**Request:**
 ```json
 {
-  "_id": 1,
-  "resource_id": 1,
-  "title": "Library Study Spaces",
-  "description": "Quiet study areas with computers and research materials",
-  "url": "https://library.university.edu/study",
-  "category": "Study Spaces",
-  "tags": ["library", "study", "quiet"],
-  "owner_id": 1,
-  "is_public": true,
-  "embedding": [0.1, 0.2, 0.3, ...], // 384-dimensional vector
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
+  "question": "How can I improve my study habits?"
 }
 ```
 
-### **Vector Search with MongoDB Atlas Search**
-```javascript
-// Vector search using MongoDB Atlas Search
+**Response:**
+```json
 {
-  "$vectorSearch": {
-    "index": "vector_search_index",
-    "path": "embedding",
-    "queryVector": [0.1, 0.2, 0.3, ...],
-    "numCandidates": 50,
-    "limit": 5
-  }
+  "question": "How can I improve my study habits?",
+  "answer": "Great question about studying! Here are some effective study strategies...",
+  "relevant_resources": [],
+  "user_id": null,
+  "timestamp": 1694640000.0
 }
 ```
 
-## 🔧 **API Endpoints**
+### Search Resources
 
-### **Resources Management**
-- `POST /api/v1/resources/` - Create resource with vector embedding
-- `GET /api/v1/resources/` - List resources with filtering
-- `POST /api/v1/resources/batch` - Batch create resources
-- `GET /api/v1/resources/categories/list` - List all categories
-- `GET /api/v1/resources/stats/summary` - Resource statistics
+**Endpoint:** `POST /api/v1/search/`
 
-### **AI-Powered Search**
-- `POST /api/v1/ask/` - Ask questions with AI responses
-- `POST /api/v1/search/semantic` - Semantic vector search
-- `POST /api/v1/search/vector` - Direct vector search
-- `GET /api/v1/search/status` - Search system status
-
-### **User Management**
-- `POST /api/v1/users/` - Create user
-- `GET /api/v1/users/` - List users
-- `GET /api/v1/users/{user_id}` - Get user details
-- `PUT /api/v1/users/{user_id}` - Update user
-- `DELETE /api/v1/users/{user_id}` - Delete user
-
-### **Analytics & Monitoring**
-- `GET /api/v1/analytics/search-stats` - Search statistics
-- `GET /api/v1/analytics/user-activity/{user_id}` - User activity
-- `GET /api/v1/analytics/system-health` - System health metrics
-- `GET /api/v1/analytics/search-trends` - Search trends over time
-
-## 💡 **Usage Examples**
-
-### **Create a Resource**
-```bash
-curl -X POST "http://localhost:8000/api/v1/resources/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Library Study Spaces",
-    "description": "Quiet study areas with computers and research materials",
-    "url": "https://library.university.edu/study",
-    "category": "Study Spaces",
-    "tags": ["library", "study", "quiet"],
-    "is_public": true
-  }'
+**Request:**
+```json
+{
+  "query": "fitness programs",
+  "limit": 5
+}
 ```
 
-### **Ask a Question**
+## Environment Setup
+
+### MongoDB Atlas Setup
+
+1. **Create MongoDB Atlas Account**
+   - Go to https://www.mongodb.com/atlas
+   - Sign up for a free account
+
+2. **Create a Cluster**
+   - Choose the free tier (M0)
+   - Select a region close to you
+   - Name your cluster
+
+3. **Set up Database Access**
+   - Go to "Database Access" in the left sidebar
+   - Click "Add New Database User"
+   - Create a username and password
+   - Set privileges to "Read and write to any database"
+
+4. **Set up Network Access**
+   - Go to "Network Access" in the left sidebar
+   - Click "Add IP Address"
+   - Choose "Allow access from anywhere" (0.0.0.0/0) for development
+   - For production, add specific IP addresses
+
+5. **Get Connection String**
+   - Go to "Clusters" in the left sidebar
+   - Click "Connect" on your cluster
+   - Choose "Connect your application"
+   - Copy the connection string
+   - Replace `<password>` with your database user password
+   - Replace `<dbname>` with `university_resources`
+
+6. **Add to .env file**
+   ```env
+   MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/university_resources?retryWrites=true&w=majority
+   ```
+
+### Gemini API Setup (Optional)
+
+1. **Get Gemini API Key**
+   - Go to https://makersuite.google.com/app/apikey
+   - Sign in with your Google account
+   - Create a new API key
+
+2. **Add to .env file**
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
+
+## Project Structure
+
+```
+back end/
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # FastAPI application
+│   ├── database.py          # Database connections
+│   ├── models.py            # SQLAlchemy models
+│   ├── schemas.py           # Pydantic schemas
+│   ├── gemini.py            # AI logic and search
+│   └── routers/
+│       ├── ask.py           # Q&A endpoints
+│       ├── search.py        # Search endpoints
+│       ├── users.py         # User management
+│       ├── resources.py     # Resource management
+│       ├── analytics.py     # Analytics
+│       └── upload.py        # Data upload
+├── alembic/                 # Database migrations
+├── venv/                    # Virtual environment
+├── requirements.txt         # Python dependencies
+├── .env                     # Environment variables
+├── ttu_resources.json       # University resources data
+└── README.md               # This file
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port 8000 already in use**
+   ```bash
+   # Kill processes using port 8000
+   netstat -ano | findstr :8000
+   taskkill /PID <PID_NUMBER> /F
+   ```
+
+2. **MongoDB connection failed**
+   - Check your MongoDB URL in `.env`
+   - Ensure your IP is whitelisted in MongoDB Atlas
+   - Verify your database user credentials
+
+3. **Module not found errors**
+   ```bash
+   # Make sure virtual environment is activated
+   venv\Scripts\activate  # Windows
+   source venv/bin/activate  # macOS/Linux
+   
+   # Reinstall requirements
+   pip install -r requirements.txt
+   ```
+
+4. **Database migration errors**
+   ```bash
+   # Reset and run migrations
+   alembic downgrade base
+   alembic upgrade head
+   ```
+
+## Development
+
+### Adding New Resources
+
+1. **Upload via API**
+   ```bash
+   curl -X POST "http://localhost:8000/api/v1/upload/ttu-resources" \
+        -H "Content-Type: application/json"
+   ```
+
+2. **Manual upload**
+   - Add resources to `ttu_resources.json`
+   - Use the upload endpoint to process them
+
+### Testing
+
 ```bash
+# Test the API
 curl -X POST "http://localhost:8000/api/v1/ask/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "question": "Where can I find quiet places to study?",
-    "user_id": 1,
-    "search_type": "semantic"
-  }'
+     -H "Content-Type: application/json" \
+     -d '{"question": "What fitness programs are available?"}'
 ```
 
-### **Semantic Search**
-```bash
-curl -X POST "http://localhost:8000/api/v1/search/semantic" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "computer labs for programming",
-    "limit": 5,
-    "score_threshold": 0.7
-  }'
-```
+## Production Deployment
 
-## 🔍 **Search Types**
+1. **Set up production environment variables**
+2. **Use a production WSGI server** (e.g., Gunicorn)
+3. **Set up proper MongoDB Atlas security**
+4. **Configure reverse proxy** (e.g., Nginx)
+5. **Set up monitoring and logging**
 
-### **1. Semantic Search**
-- Uses vector embeddings for meaning-based search
-- Finds conceptually similar content
-- Powered by sentence-transformers + MongoDB Atlas Search
+## Support
 
-### **2. Vector Search**
-- Direct vector similarity search
-- Configurable similarity thresholds
-- Real-time performance
+For issues or questions:
+1. Check the troubleshooting section
+2. Review the API documentation at http://localhost:8000/docs
+3. Check the logs for error messages
 
-### **3. Hybrid Search**
-- Combines semantic and keyword search
-- Best of both approaches
-- Intelligent result ranking
+## License
 
-## 📈 **Performance & Scalability**
-
-### **Vector Database (MongoDB Atlas)**
-- **Capacity**: Millions of vectors
-- **Speed**: Sub-second search times
-- **Memory**: Efficient vector storage
-- **Scalability**: Global cloud scaling
-- **Availability**: 99.99% uptime SLA
-
-### **PostgreSQL**
-- **ACID Compliance**: Reliable data integrity
-- **Indexing**: Fast metadata queries
-- **Relationships**: Complex data modeling
-- **Analytics**: Advanced reporting capabilities
-
-### **AI Integration**
-- **Gemini 2.5 Pro**: Latest Google AI model
-- **Context Awareness**: Understands user intent
-- **Response Quality**: Human-like answers
-- **Scalability**: Handles concurrent requests
-
-## 🛠️ **Configuration**
-
-### **Environment Variables**
-```env
-# PostgreSQL Database (User Data)
-POSTGRES_URL=postgresql://postgres:password@localhost:5432/university_resources
-
-# MongoDB Atlas (Vector Search)
-MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/university_resources
-
-# Google Gemini API
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Application Settings
-DEBUG=False
-SECRET_KEY=your-secret-key-here
-```
-
-### **MongoDB Atlas Setup**
-```javascript
-// 1. Create a new cluster in MongoDB Atlas
-// 2. Get your connection string
-// 3. Create a database named 'university_resources'
-// 4. Create a collection named 'resources'
-// 5. Create a vector search index:
-
-{
-  "fields": [
-    {
-      "type": "vector",
-      "path": "embedding",
-      "numDimensions": 384,
-      "similarity": "cosine"
-    },
-    {
-      "type": "string",
-      "path": "title"
-    },
-    {
-      "type": "string",
-      "path": "description"
-    },
-    {
-      "type": "string",
-      "path": "category"
-    }
-  ]
-}
-```
-
-## 📊 **Monitoring & Analytics**
-
-### **Search Analytics**
-- Query patterns and trends
-- Response time metrics
-- User behavior analysis
-- Search success rates
-
-### **System Health**
-- Database connection status
-- Vector database performance
-- AI service availability
-- Resource utilization
-
-### **User Insights**
-- Most active users
-- Popular search terms
-- Resource usage patterns
-- Question-answer pairs
-
-## 🚀 **Production Deployment**
-
-### **1. Database Setup**
-```bash
-# Install PostgreSQL
-sudo apt-get install postgresql postgresql-contrib
-
-# Create database
-sudo -u postgres createdb university_resources
-
-# MongoDB Atlas
-# - Create account at https://www.mongodb.com/atlas
-# - Create new cluster
-# - Get connection string
-# - Create vector search index
-```
-
-### **2. Application Deployment**
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run migrations
-alembic upgrade head
-
-# Start application
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-### **3. Load Balancing**
-- Use Nginx or similar for load balancing
-- Multiple application instances
-- Database connection pooling
-- MongoDB Atlas auto-scaling
-
-## 🔧 **Development**
-
-### **Running Tests**
-```bash
-python test_api.py
-```
-
-### **Database Migrations**
-```bash
-# Create migration
-alembic revision --autogenerate -m "Description"
-
-# Apply migration
-alembic upgrade head
-```
-
-### **MongoDB Atlas Management**
-```javascript
-// View collection statistics
-db.resources.stats()
-
-// View search indexes
-db.resources.listSearchIndexes()
-
-// Test vector search
-db.resources.aggregate([
-  {
-    "$vectorSearch": {
-      "index": "vector_search_index",
-      "path": "embedding",
-      "queryVector": [0.1, 0.2, 0.3, ...],
-      "numCandidates": 10,
-      "limit": 5
-    }
-  }
-])
-```
-
-## 🆚 **Architecture Comparison**
-
-| Feature | PostgreSQL + MongoDB Atlas | PostgreSQL + pgvector | Qdrant |
-|---------|---------------------------|----------------------|--------|
-| **Data Scale** | Millions | Millions | Millions |
-| **Search Speed** | Sub-second | Sub-second | Sub-second |
-| **AI Integration** | Advanced | Advanced | Advanced |
-| **User Management** | Full | Full | Full |
-| **Analytics** | Comprehensive | Comprehensive | Good |
-| **Scalability** | High | High | High |
-| **Setup Complexity** | Medium | Medium | Low |
-| **Maintenance** | Low | Medium | Low |
-| **Cloud Native** | Yes | No | Yes |
-| **Global Scaling** | Yes | No | Yes |
-
-## 🎯 **Use Cases**
-
-### **Perfect For:**
-- Large university resource databases
-- AI-powered search systems
-- User management applications
-- Analytics and reporting
-- Production-scale deployments
-- Global applications
-- Cloud-native solutions
-
-### **Not Ideal For:**
-- Simple static websites
-- Basic CRUD applications
-- Development prototypes
-- Single-user systems
-- On-premise only solutions
-
-## 📚 **API Documentation**
-
-Complete API documentation is available at:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-
-## 🤝 **Contributing**
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 **License**
-
-This project is open source and available under the MIT License.
-
----
-
-**Built with ❤️ for large-scale AI-powered resource management with cloud-native architecture**
+This project is for educational purposes at Texas Tech University.
