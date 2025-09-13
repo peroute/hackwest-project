@@ -1,12 +1,50 @@
-# React + Vite
+# Texas Tech University AI Chat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, accessible AI chat web app for Texas Tech University resources, built with React 18 and Vite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Responsive, accessible chat UI with Texas Tech branding
+- Modular CSS (CSS Modules) and global CSS reset
+- Message list with auto-scroll, timestamps, and loading indicator
+- Inline error handling and retry
+- Keyboard accessible input (Enter to send, Shift+Enter for newline)
+- Placeholder backend endpoint
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Run the app locally:**
+   ```bash
+   npm run dev
+   ```
+
+3. **Open in your browser:**
+   - Visit [http://localhost:5173](http://localhost:5173) (default Vite port)
+
+## Backend Endpoint
+
+- The frontend sends chat requests to a placeholder backend at:
+  ```
+  http://localhost:5000/chat
+  ```
+- To change this, edit the `CHAT_ENDPOINT` constant in `src/pages/ChatScreen.jsx`.
+
+## Project Structure
+
+- `src/components/` – Reusable UI components
+- `src/pages/` – Main chat screen
+- `src/styles/` – CSS modules and global styles
+
+## Customization
+
+- Replace the logo placeholder in `src/App.jsx` and `App.module.css` with the official Texas Tech logo if desired.
+- Adjust colors in `src/styles/global.css` for further branding.
+
+---
+
+**This project is frontend-only.** You must provide a backend at the specified endpoint for full functionality.

@@ -1,0 +1,52 @@
+/* CSS Reset & Global Styles */
+:root {
+  --color-primary: #CC0000;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-bg: #f7f7f7;
+  --font-main: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  --border-radius: 12px;
+  --transition: 0.2s cubic-bezier(.4,1.6,.6,1);
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-black);
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+button, input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #eee;
+}
+::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+@media (max-width: 700px) {
+  html, body, #root {
+    font-size: 16px;
+  }
+}

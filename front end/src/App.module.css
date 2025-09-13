@@ -1,0 +1,44 @@
+.appContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: var(--color-white);
+  border-radius: 8px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background: var(--color-bg);
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background: var(--color-black);
+  color: var(--color-white);
+  font-size: 0.95rem;
+}

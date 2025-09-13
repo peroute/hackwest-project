@@ -1,0 +1,44 @@
+.inputBar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-top: 1px solid #eee;
+  background: var(--color-bg);
+}
+
+.textarea {
+  flex: 1;
+  min-height: 38px;
+  max-height: 120px;
+  resize: none;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+  background: var(--color-white);
+  color: var(--color-black);
+}
+.textarea:focus {
+  border: 1.5px solid var(--color-primary);
+}
+
+.sendBtn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.3rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(204,0,0,0.06);
+}
+.sendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
