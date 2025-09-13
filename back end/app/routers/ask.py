@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from ..database import get_postgres_db
 from ..schemas import AskRequest, AskResponse, SearchLogCreate
-from ..gemini import ask_question_with_ai
+from ..gemini import ask_question_with_ai, cleanup_old_conversation_history
 from ..models import SearchLog, Question
 import time
 
@@ -35,26 +35,27 @@ async def ask_question(
         # Calculate response time
         response_time = int((time.time() - start_time) * 1000)
         
-        # Log the search
-        search_log = SearchLog(
-            query=request.question,
-            results_count=len(response.relevant_resources),
-            user_id=request.user_id,
-            search_type=request.search_type,
-            response_time_ms=response_time
-        )
-        db.add(search_log)
-        
-        # Log the question
-        question = Question(
-            question_text=request.question,
-            answer_text=response.answer,
-            user_id=request.user_id,
-            similarity_score=str(response.relevant_resources[0].similarity_score) if response.relevant_resources else None
-        )
-        db.add(question)
-        
-        db.commit()
+        # Log the search and question only if user_id is provided
+        if request.user_id:
+            search_log = SearchLog(
+                query=request.question,
+                results_count=len(response.relevant_resources),
+                user_id=request.user_id,
+                search_type=request.search_type,
+                response_time_ms=response_time
+            )
+            db.add(search_log)
+            
+            # Log the question
+            question = Question(
+                question_text=request.question,
+                answer_text=response.answer,
+                user_id=request.user_id,
+                similarity_score=str(response.relevant_resources[0].similarity_score) if response.relevant_resources else None
+            )
+            db.add(question)
+            
+            db.commit()
         
         return response
         
@@ -128,3 +129,34 @@ async def get_qa_stats(db: Session = Depends(get_postgres_db)):
         "average_response_time_ms": round(avg_response_time, 2),
         "recent_questions_24h": recent_questions
     }
+
+
+@router.post("/cleanup-history/{user_id}")
+async def cleanup_user_history(
+    user_id: int,
+    keep_messages: int = 10,
+    db: Session = Depends(get_postgres_db)
+):
+    """
+    Clean up old conversation history for a specific user.
+    Keeps only the last N messages.
+    """
+    try:
+        await cleanup_old_conversation_history(user_id, keep_messages)
+        
+        # Get remaining count
+        remaining_questions = db.query(Question).filter(
+            Question.user_id == user_id
+        ).count()
+        
+        return {
+            "message": f"Conversation history cleaned up for user {user_id}",
+            "remaining_messages": remaining_questions,
+            "kept_messages": keep_messages
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to cleanup history: {str(e)}"
+        )
