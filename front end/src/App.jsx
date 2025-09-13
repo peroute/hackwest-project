@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Login from '/Users/aminagahramanova/Desktop/hackwest-project/front end/src/components/Login.jsx'
+import Login from './components/Login.jsx'
 import ChatPage from './pages/ChatPage'
-import '/Users/aminagahramanova/Desktop/hackwest-project/front end/src/styles/Login.css'
+import './styles/Login.css'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
