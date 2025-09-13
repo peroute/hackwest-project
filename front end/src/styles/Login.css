@@ -1,0 +1,228 @@
+/* TTU Theme Colors */
+:root {
+    --ttu-red: #CC0000;
+    --ttu-black: #000000;
+    --ttu-white: #FFFFFF;
+    --ttu-gray: #666666;
+    --ttu-light-gray: #F5F5F5;
+    --ttu-dark-gray: #333333;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    line-height: 2.0;
+    color: var(--ttu-black);
+    background-color: var(--ttu-white);
+    min-height: 100vh;
+  }
+  
+  /* TTU Header Styles */
+  .ttu-header {
+    background-color: var(--ttu-red);
+    color: var(--ttu-white);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .ttu-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: var(--ttu-white);
+  }
+  
+  .ttu-logo:hover {
+    color: var(--ttu-light-gray);
+  }
+  
+  /* Container Styles */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Login Page Styles */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, var(--ttu-light-gray) 0%, #E8E8E8 100%);
+  }
+  
+  .login-card {
+    background: var(--ttu-white);
+    padding: 3rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 450px;
+    border: 2px solid var(--ttu-red);
+  }
+  
+  .login-title {
+    color: var(--ttu-red);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--ttu-dark-gray);
+    font-weight: 600;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: var(--ttu-red);
+  }
+  
+  .ttu-button {
+    background-color: var(--ttu-red);
+    color: var(--ttu-white);
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+  }
+  
+  .ttu-button:hover {
+    background-color: #B30000;
+  }
+  
+  .ttu-button:disabled {
+    background-color: var(--ttu-gray);
+    cursor: not-allowed;
+  }
+  
+  /* Main Page Styles */
+  .main-content {
+    padding: 2rem 0;
+  }
+  
+  .welcome-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--ttu-red) 0%, #B30000 100%);
+    color: var(--ttu-white);
+    border-radius: 10px;
+  }
+  
+  .welcome-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .feature-card {
+    background: var(--ttu-white);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--ttu-red);
+    transition: transform 0.3s;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .feature-title {
+    color: var(--ttu-red);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .feature-description {
+    color: var(--ttu-dark-gray);
+    line-height: 1.6;
+  }
+  
+  /* Navigation */
+  .nav-links {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    color: var(--ttu-white);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+    
+    .login-card {
+      padding: 2rem;
+      margin: 1rem;
+    }
+    
+    .welcome-title {
+      font-size: 2rem;
+    }
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .ttu-header {
+      padding: 1rem;
+    }
+    
+    .nav-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
