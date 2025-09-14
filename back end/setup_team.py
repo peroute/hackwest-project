@@ -20,6 +20,9 @@ def print_header():
     print("   • Set up the database")
     print("   • Create configuration files")
     print()
+    print("⚠️  If you get virtual environment errors:")
+    print("   Delete the 'venv' folder and run this script again")
+    print()
 
 def check_python_version():
     """Check if Python version is compatible"""
@@ -37,17 +40,18 @@ def create_virtual_environment():
     """Create virtual environment"""
     print("\n📦 Creating virtual environment...")
     
-    # Check if virtual environment already exists
+    # Remove existing venv if it exists
     if os.path.exists("venv"):
-        print("✅ Virtual environment already exists")
-        return True
+        print("🗑️  Removing existing virtual environment...")
+        import shutil
+        shutil.rmtree("venv", ignore_errors=True)
     
     try:
         subprocess.run([sys.executable, "-m", "venv", "venv"], check=True)
         print("✅ Virtual environment created successfully")
         return True
-    except subprocess.CalledProcessError:
-        print("❌ Failed to create virtual environment")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to create virtual environment: {e}")
         return False
 
 def get_activation_command():
@@ -79,7 +83,16 @@ def install_dependencies():
     if not os.path.exists(pip_path):
         print(f"❌ Pip not found at {pip_path}")
         print("   This might happen if the virtual environment wasn't created properly")
-        print("   Try deleting the 'venv' folder and running the script again")
+        print("   The script will try to recreate the virtual environment...")
+        return False
+    
+    # Verify pip is working by checking its version
+    try:
+        result = subprocess.run([pip_path, "--version"], capture_output=True, text=True, check=True)
+        print(f"✅ Using pip: {result.stdout.strip()}")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Pip is not working: {e}")
+        print("   The virtual environment may be corrupted")
         return False
     
     try:
@@ -238,10 +251,15 @@ def main():
         print("\n❌ Setup failed: Could not create virtual environment")
         return False
     
-    # Install dependencies
+    # Install dependencies (with retry if venv was recreated)
     if not install_dependencies():
-        print("\n❌ Setup failed: Could not install dependencies")
-        return False
+        print("\n⚠️  First attempt failed, trying to recreate virtual environment...")
+        if not create_virtual_environment():
+            print("\n❌ Setup failed: Could not recreate virtual environment")
+            return False
+        if not install_dependencies():
+            print("\n❌ Setup failed: Could not install dependencies after retry")
+            return False
     
     # Create .env file
     create_env_file()
