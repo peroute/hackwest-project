@@ -1,0 +1,28 @@
+# FastAPI and web framework
+fastapi==0.65.2
+uvicorn==0.15.0
+
+# Database
+sqlalchemy==1.4.23
+alembic==1.7.7
+pymongo==4.0.1
+
+# Data validation
+pydantic==1.10.23
+
+# Form data support
+python-multipart==0.0.20
+
+# Environment variables
+python-dotenv==1.0.0
+
+# HTTP requests
+requests==2.31.0
+
+# Optional AI libraries (will fallback if not available)
+# google-generativeai==0.8.5
+# sentence-transformers==2.2.2
+
+# Development dependencies (optional)
+# pytest==7.4.3
+# pytest-asyncio==0.21.1
