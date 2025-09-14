@@ -117,6 +117,7 @@ Do not include any other text outside the JSON object.";
             .Replace("```", "")
             .Trim();
 
+
             using var jsonDoc = JsonDocument.Parse(cleanedJson);
             var root = jsonDoc.RootElement;
 
@@ -136,28 +137,8 @@ Do not include any other text outside the JSON object.";
                 // Get the user message from Gemini's response
                 var userMessage = root.TryGetProperty("userMessage", out var message) ? message.GetString() : "";
 
-                // Create a simple message with search results
-                if (searchResults.Count > 0)
-                {
-                    var resultsText = string.Join("\n\n", searchResults.Select((result, index) =>
-                    {
-                        if (result is Dictionary<string, object> dict)
-                        {
-                            var title = dict.GetValueOrDefault("title", "Resource");
-                            var description = dict.GetValueOrDefault("description", "");
-                            var url = dict.GetValueOrDefault("url", "");
-                            var score = dict.GetValueOrDefault("score", 0);
-                            return $"**{index + 1}. [{title}]({url})**\n{description}\n*Relevance: {score:F1}*";
-                        }
-                        return $"**{index + 1}. Resource**";
-                    }));
-
-                    return $"{userMessage}\n\nHere are the best resources I found:\n\n{resultsText}";
-                }
-                else
-                {
-                    return $"{userMessage}\n\nI couldn't find any specific resources for your search. Please try different keywords or ask me something else!";
-                }
+                // Create an AI-summarized message with top 3 search results
+                return await FormatSearchResults(userMessage, searchResults);
             }
             else
             {
@@ -174,5 +155,87 @@ Do not include any other text outside the JSON object.";
         }
     }
 
+    private async Task<string> FormatSearchResults(string userMessage, List<object> searchResults)
+    {
+        if (searchResults.Count == 0)
+        {
+            return $"{userMessage}\n\nI couldn't find any specific resources for your search. Please try different keywords or ask me something else!";
+        }
+
+        // Take top 3 results
+        var topResults = searchResults.Take(3).ToList();
+
+        // Prepare search results for AI analysis
+        var resultsText = string.Join("\n\n", topResults.Select((result, index) =>
+        {
+            if (result is Dictionary<string, object> dict)
+            {
+                var title = dict.GetValueOrDefault("title", "Resource");
+                var description = dict.GetValueOrDefault("description", "");
+                var url = dict.GetValueOrDefault("url", "");
+                var category = dict.GetValueOrDefault("category", "");
+                var score = dict.GetValueOrDefault("score", 0);
+
+                return $"Result {index + 1}:\nTitle: {title}\nDescription: {description}\nCategory: {category}\nURL: {url}\nRelevance: {score:F2}";
+            }
+            return $"Result {index + 1}: Resource";
+        }));
+
+        // Send to Gemini for intelligent summarization
+        var analysisPrompt = $@"You are a helpful Texas Tech University assistant. The user asked: ""{userMessage}""
+
+I found {topResults.Count} relevant resources. Please analyze these results and provide a helpful, summarized response that:
+
+1. Acknowledges the user's question
+2. Summarizes the key information from the resources
+3. Provides direct clickable links to the most relevant resources
+4. Keeps the response concise but informative
+5. Focuses on what the user actually needs
+
+Search Results:
+{resultsText}
+
+Please respond with a helpful summary that includes the clickable links. Format links as [Title](URL). Be conversational and helpful.";
+
+        try
+        {
+            var request = new GeminiRequest
+            {
+                Contents = new List<Content>
+                {
+                    new Content
+                    {
+                        Parts = new List<Part>
+                        {
+                            new Part { Text = analysisPrompt }
+                        }
+                    }
+                }
+            };
+
+            var response = await CallGeminiApiAsync(request);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting AI summary for search results");
+
+            // Fallback to simple formatted results
+            var fallbackResults = string.Join("\n\n", topResults.Select((result, index) =>
+            {
+                if (result is Dictionary<string, object> dict)
+                {
+                    var title = dict.GetValueOrDefault("title", "Resource");
+                    var description = dict.GetValueOrDefault("description", "");
+                    var url = dict.GetValueOrDefault("url", "");
+
+                    return $"**{index + 1}. [{title}]({url})**\n{description}";
+                }
+                return $"**{index + 1}. Resource**";
+            }));
+
+            return $"{userMessage}\n\nHere are the best resources I found:\n\n{fallbackResults}";
+        }
+    }
 
 }
