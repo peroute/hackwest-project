@@ -10,16 +10,10 @@ const formatTime = (date) => {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-const CHAT_ENDPOINT = 'http://localhost:5000/chat';
+const CHAT_ENDPOINT = 'http://localhost:5468/api/Gemini/generate';
 
 const ChatScreen = () => {
-  const [messages, setMessages] = useState([
-    {
-      role: 'ai',
-      text: 'Hi! I am your Texas Tech AI assistant. How can I help you today?',
-      timestamp: new Date().toISOString(),
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pendingUserMsg, setPendingUserMsg] = useState(null); // For retry
@@ -48,19 +42,19 @@ const ChatScreen = () => {
       const res = await fetch(CHAT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText }),
+        body: JSON.stringify({ prompt: userText }),
       });
 
       if (!res.ok) throw new Error('Network error');
       const data = await res.json();
 
-      if (!data.reply) throw new Error('Invalid response from server');
+      if (!data) throw new Error('Invalid response from server');
 
       setMessages((prev) => [
         ...prev,
         {
           role: 'ai',
-          text: data.reply,
+          text: data.text,
           timestamp: new Date().toISOString(),
         },
       ]);
@@ -81,19 +75,19 @@ const ChatScreen = () => {
         const res = await fetch(CHAT_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: pendingUserMsg.text }),
+          body: JSON.stringify({ prompt: pendingUserMsg.text }),
         });
 
         if (!res.ok) throw new Error('Network error');
         const data = await res.json();
 
-        if (!data.reply) throw new Error('Invalid response from server');
+        if (!data) throw new Error('Invalid response from server');
 
         setMessages((prev) => [
           ...prev,
           {
             role: 'ai',
-            text: data.reply,
+            text: data.text,
             timestamp: new Date().toISOString(),
           },
         ]);
