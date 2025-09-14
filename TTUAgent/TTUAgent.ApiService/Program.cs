@@ -26,11 +26,12 @@ builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .SetIsOriginAllowed(origin => true);
     });
 });
 // Register HttpClient for OpenAI
@@ -47,8 +48,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseCors();
 
-app.UseCors("AllowAll");
+app.MapControllers();
 
 app.Run();
