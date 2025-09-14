@@ -1,14 +1,17 @@
 # FastAPI and web framework
-fastapi==0.104.1
-uvicorn==0.24.0
+fastapi==0.65.2
+uvicorn==0.15.0
 
 # Database
-sqlalchemy==1.4.53
-alembic==1.13.1
-pymongo==4.6.1
+sqlalchemy==1.4.23
+alembic==1.7.7
+pymongo==4.0.1
 
 # Data validation
-pydantic==1.10.13
+pydantic==1.10.23
+
+# Form data support
+python-multipart==0.0.20
 
 # Environment variables
 python-dotenv==1.0.0
