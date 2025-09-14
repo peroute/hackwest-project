@@ -23,6 +23,16 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 // Register HttpClient for OpenAI
 builder.Services.AddHttpClient();
 
@@ -38,5 +48,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowAll");
 
 app.Run();

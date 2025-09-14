@@ -112,12 +112,14 @@ Do not include any other text outside the JSON object.";
         // Try to parse the JSON response to check if it's a search request
         try
         {
-            var cleanedJson = initialResponse
-            .Replace("```json", "")
-            .Replace("```", "")
-            .Trim();
+            // First, check if the response looks like JSON
+            if (string.IsNullOrWhiteSpace(initialResponse) || (!initialResponse.TrimStart().StartsWith("{") && !initialResponse.TrimStart().StartsWith("[")))
+            {
+                _logger.LogInformation("Response is not JSON format, returning as plain text");
+                return initialResponse;
+            }
 
-            using var jsonDoc = JsonDocument.Parse(cleanedJson);
+            using var jsonDoc = JsonDocument.Parse(initialResponse);
             var root = jsonDoc.RootElement;
 
             // Check if it's a search request
@@ -136,28 +138,8 @@ Do not include any other text outside the JSON object.";
                 // Get the user message from Gemini's response
                 var userMessage = root.TryGetProperty("userMessage", out var message) ? message.GetString() : "";
 
-                // Create a simple message with search results
-                if (searchResults.Count > 0)
-                {
-                    var resultsText = string.Join("\n\n", searchResults.Select((result, index) =>
-                    {
-                        if (result is Dictionary<string, object> dict)
-                        {
-                            var title = dict.GetValueOrDefault("title", "Resource");
-                            var description = dict.GetValueOrDefault("description", "");
-                            var url = dict.GetValueOrDefault("url", "");
-                            var score = dict.GetValueOrDefault("score", 0);
-                            return $"**{index + 1}. [{title}]({url})**\n{description}\n*Relevance: {score:F1}*";
-                        }
-                        return $"**{index + 1}. Resource**";
-                    }));
-
-                    return $"{userMessage}\n\nHere are the best resources I found:\n\n{resultsText}";
-                }
-                else
-                {
-                    return $"{userMessage}\n\nI couldn't find any specific resources for your search. Please try different keywords or ask me something else!";
-                }
+                // Create an AI-summarized message with top 3 search results
+                return await FormatSearchResults(userMessage, searchResults);
             }
             else
             {
@@ -174,5 +156,87 @@ Do not include any other text outside the JSON object.";
         }
     }
 
+    private async Task<string> FormatSearchResults(string userMessage, List<object> searchResults)
+    {
+        if (searchResults.Count == 0)
+        {
+            return $"{userMessage}\n\nI couldn't find any specific resources for your search. Please try different keywords or ask me something else!";
+        }
+
+        // Take top 3 results
+        var topResults = searchResults.Take(3).ToList();
+
+        // Prepare search results for AI analysis
+        var resultsText = string.Join("\n\n", topResults.Select((result, index) =>
+        {
+            if (result is Dictionary<string, object> dict)
+            {
+                var title = dict.GetValueOrDefault("title", "Resource");
+                var description = dict.GetValueOrDefault("description", "");
+                var url = dict.GetValueOrDefault("url", "");
+                var category = dict.GetValueOrDefault("category", "");
+                var score = dict.GetValueOrDefault("score", 0);
+
+                return $"Result {index + 1}:\nTitle: {title}\nDescription: {description}\nCategory: {category}\nURL: {url}\nRelevance: {score:F2}";
+            }
+            return $"Result {index + 1}: Resource";
+        }));
+
+        // Send to Gemini for intelligent summarization
+        var analysisPrompt = $@"You are a helpful Texas Tech University assistant. The user asked: ""{userMessage}""
+
+I found {topResults.Count} relevant resources. Please provide a concise summary that:
+
+1. Acknowledges the user's question briefly
+2. Summarizes each resource in maximum 3 sentences
+3. Includes clickable links for each resource
+4. Keep the total response under 200 words
+5. Be direct and helpful
+
+Search Results:
+{resultsText}
+
+Format: [Resource Title](URL) - Brief 1-3 sentence summary. Repeat for each resource.";
+
+        try
+        {
+            var request = new GeminiRequest
+            {
+                Contents = new List<Content>
+                {
+                    new Content
+                    {
+                        Parts = new List<Part>
+                        {
+                            new Part { Text = analysisPrompt }
+                        }
+                    }
+                }
+            };
+
+            var response = await CallGeminiApiAsync(request);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting AI summary for search results");
+
+            // Fallback to simple formatted results
+            var fallbackResults = string.Join("\n\n", topResults.Select((result, index) =>
+            {
+                if (result is Dictionary<string, object> dict)
+                {
+                    var title = dict.GetValueOrDefault("title", "Resource");
+                    var description = dict.GetValueOrDefault("description", "");
+                    var url = dict.GetValueOrDefault("url", "");
+
+                    return $"**{index + 1}. [{title}]({url})**\n{description}";
+                }
+                return $"**{index + 1}. Resource**";
+            }));
+
+            return $"{userMessage}\n\nHere are the best resources I found:\n\n{fallbackResults}";
+        }
+    }
 
 }
