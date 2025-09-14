@@ -14,6 +14,12 @@ def print_header():
     print("🚀 Texas Tech University AI Assistant - Team Setup")
     print("=" * 60)
     print()
+    print("📋 This script will:")
+    print("   • Create a virtual environment")
+    print("   • Install required dependencies")
+    print("   • Set up the database")
+    print("   • Create configuration files")
+    print()
 
 def check_python_version():
     """Check if Python version is compatible"""
@@ -72,6 +78,8 @@ def install_dependencies():
     # Check if pip exists
     if not os.path.exists(pip_path):
         print(f"❌ Pip not found at {pip_path}")
+        print("   This might happen if the virtual environment wasn't created properly")
+        print("   Try deleting the 'venv' folder and running the script again")
         return False
     
     try:
@@ -206,6 +214,19 @@ def print_next_steps():
 def main():
     """Main setup function"""
     print_header()
+    
+    # Ensure we're in the correct directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
+    print(f"📁 Working directory: {os.getcwd()}")
+    
+    # Check if we're in the right directory
+    required_files = ["requirements.txt", "app", "alembic.ini"]
+    missing_files = [f for f in required_files if not os.path.exists(f)]
+    if missing_files:
+        print(f"❌ Missing required files: {', '.join(missing_files)}")
+        print("   Make sure you're running this script from the project root directory")
+        return False
     
     # Check Python version
     if not check_python_version():
